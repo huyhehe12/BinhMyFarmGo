@@ -36,7 +36,7 @@ export const Route = createFileRoute("/ban-do")({
     }
   },
   errorComponent: () => (
-    <div className="mx-auto max-w-6xl px-4 py-12">Không tải được bản đồ, vui lòng thử lại.</div>
+    <div className="mx-auto max-w-6xl px-4 py-12">Bản đồ đang tạm gián đoạn, vui lòng tải lại trang để xem 4 địa điểm minh họa.</div>
   ),
   notFoundComponent: () => <div className="mx-auto max-w-6xl px-4 py-12">Không tìm thấy.</div>,
   component: MapPage,
