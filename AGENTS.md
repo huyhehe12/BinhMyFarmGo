@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep all floating quick-contact destinations in `src/lib/contact-config.ts` so missing details consistently show the prototype fallback instead of invented links.
