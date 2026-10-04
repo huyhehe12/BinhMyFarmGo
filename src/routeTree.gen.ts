@@ -18,6 +18,7 @@ import { Route as DonViCungCapRouteImport } from './routes/don-vi-cung-cap'
 import { Route as DuLichRouteImport } from './routes/du-lich'
 import { Route as GioiThieuRouteImport } from './routes/gioi-thieu'
 import { Route as AuthenticatedQuanTriRouteImport } from './routes/_authenticated/quan-tri'
+import { Route as DuLichBinhMyRiversideRouteImport } from './routes/du-lich.binh-my-riverside'
 import { Route as SanPhamIndexRouteImport } from './routes/san-pham.index'
 import { Route as SanPhamSlugRouteImport } from './routes/san-pham.$slug'
 
@@ -65,6 +66,11 @@ const AuthenticatedQuanTriRoute = AuthenticatedQuanTriRouteImport.update({
   path: '/quan-tri',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const DuLichBinhMyRiversideRoute = DuLichBinhMyRiversideRouteImport.update({
+  id: '/binh-my-riverside',
+  path: '/binh-my-riverside',
+  getParentRoute: () => DuLichRoute,
+} as any)
 const SanPhamIndexRoute = SanPhamIndexRouteImport.update({
   id: '/san-pham/',
   path: '/san-pham/',
@@ -82,9 +88,10 @@ export interface FileRoutesByFullPath {
   '/ban-do': typeof BanDoRoute
   '/dat-mua': typeof DatMuaRoute
   '/don-vi-cung-cap': typeof DonViCungCapRoute
-  '/du-lich': typeof DuLichRoute
+  '/du-lich': typeof DuLichRouteWithChildren
   '/gioi-thieu': typeof GioiThieuRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
+  '/du-lich/binh-my-riverside': typeof DuLichBinhMyRiversideRoute
   '/san-pham/$slug': typeof SanPhamSlugRoute
   '/san-pham/': typeof SanPhamIndexRoute
 }
@@ -94,9 +101,10 @@ export interface FileRoutesByTo {
   '/ban-do': typeof BanDoRoute
   '/dat-mua': typeof DatMuaRoute
   '/don-vi-cung-cap': typeof DonViCungCapRoute
-  '/du-lich': typeof DuLichRoute
+  '/du-lich': typeof DuLichRouteWithChildren
   '/gioi-thieu': typeof GioiThieuRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
+  '/du-lich/binh-my-riverside': typeof DuLichBinhMyRiversideRoute
   '/san-pham/$slug': typeof SanPhamSlugRoute
   '/san-pham': typeof SanPhamIndexRoute
 }
@@ -108,9 +116,10 @@ export interface FileRoutesById {
   '/ban-do': typeof BanDoRoute
   '/dat-mua': typeof DatMuaRoute
   '/don-vi-cung-cap': typeof DonViCungCapRoute
-  '/du-lich': typeof DuLichRoute
+  '/du-lich': typeof DuLichRouteWithChildren
   '/gioi-thieu': typeof GioiThieuRoute
   '/_authenticated/quan-tri': typeof AuthenticatedQuanTriRoute
+  '/du-lich/binh-my-riverside': typeof DuLichBinhMyRiversideRoute
   '/san-pham/$slug': typeof SanPhamSlugRoute
   '/san-pham/': typeof SanPhamIndexRoute
 }
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/du-lich'
     | '/gioi-thieu'
     | '/quan-tri'
+    | '/du-lich/binh-my-riverside'
     | '/san-pham/$slug'
     | '/san-pham/'
   fileRoutesByTo: FileRoutesByTo
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/du-lich'
     | '/gioi-thieu'
     | '/quan-tri'
+    | '/du-lich/binh-my-riverside'
     | '/san-pham/$slug'
     | '/san-pham'
   id:
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/du-lich'
     | '/gioi-thieu'
     | '/_authenticated/quan-tri'
+    | '/du-lich/binh-my-riverside'
     | '/san-pham/$slug'
     | '/san-pham/'
   fileRoutesById: FileRoutesById
@@ -161,7 +173,7 @@ export interface RootRouteChildren {
   BanDoRoute: typeof BanDoRoute
   DatMuaRoute: typeof DatMuaRoute
   DonViCungCapRoute: typeof DonViCungCapRoute
-  DuLichRoute: typeof DuLichRoute
+  DuLichRoute: typeof DuLichRouteWithChildren
   GioiThieuRoute: typeof GioiThieuRoute
   SanPhamSlugRoute: typeof SanPhamSlugRoute
   SanPhamIndexRoute: typeof SanPhamIndexRoute
@@ -232,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQuanTriRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/du-lich/binh-my-riverside': {
+      id: '/du-lich/binh-my-riverside'
+      path: '/binh-my-riverside'
+      fullPath: '/du-lich/binh-my-riverside'
+      preLoaderRoute: typeof DuLichBinhMyRiversideRouteImport
+      parentRoute: typeof DuLichRoute
+    }
     '/san-pham/': {
       id: '/san-pham/'
       path: '/san-pham'
@@ -260,6 +279,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface DuLichRouteChildren {
+  DuLichBinhMyRiversideRoute: typeof DuLichBinhMyRiversideRoute
+}
+
+const DuLichRouteChildren: DuLichRouteChildren = {
+  DuLichBinhMyRiversideRoute: DuLichBinhMyRiversideRoute,
+}
+
+const DuLichRouteWithChildren =
+  DuLichRoute._addFileChildren(DuLichRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -267,7 +297,7 @@ const rootRouteChildren: RootRouteChildren = {
   BanDoRoute: BanDoRoute,
   DatMuaRoute: DatMuaRoute,
   DonViCungCapRoute: DonViCungCapRoute,
-  DuLichRoute: DuLichRoute,
+  DuLichRoute: DuLichRouteWithChildren,
   GioiThieuRoute: GioiThieuRoute,
   SanPhamSlugRoute: SanPhamSlugRoute,
   SanPhamIndexRoute: SanPhamIndexRoute,
