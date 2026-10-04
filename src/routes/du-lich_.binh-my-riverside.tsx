@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { experiences } from "@/data/experiences";
 import { riverside } from "@/data/riverside";
 
-export const Route = createFileRoute("/du-lich/binh-my-riverside")({
+export const Route = createFileRoute("/du-lich_/binh-my-riverside")({
   head: () => ({
     meta: [
       { title: "Bình Mỹ Riverside — Du lịch nông nghiệp Bình Mỹ FarmGo" },
