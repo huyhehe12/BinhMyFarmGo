@@ -16,6 +16,8 @@ export const Route = createFileRoute("/don-vi-cung-cap")({
         property: "og:description",
         content: "Nhóm cung cấp, nhóm sản phẩm và khu vực hoạt động ở mức tổng quát.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SuppliersPage,
