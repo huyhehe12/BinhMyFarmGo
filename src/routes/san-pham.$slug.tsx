@@ -13,7 +13,15 @@ export const Route = createFileRoute("/san-pham/$slug")({
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
-        meta: [{ title: "Không tìm thấy sản phẩm" }, { name: "robots", content: "noindex" }],
+        meta: [
+          { title: "Không tìm thấy sản phẩm — Bình Mỹ FarmGo" },
+          { name: "description", content: "Sản phẩm không có trong danh mục Bình Mỹ FarmGo." },
+          { property: "og:title", content: "Không tìm thấy sản phẩm — Bình Mỹ FarmGo" },
+          { property: "og:description", content: "Sản phẩm không có trong danh mục Bình Mỹ FarmGo." },
+          { property: "og:type", content: "website" },
+          { name: "twitter:card", content: "summary" },
+          { name: "robots", content: "noindex" },
+        ],
       };
     }
     const { product } = loaderData;
@@ -23,6 +31,8 @@ export const Route = createFileRoute("/san-pham/$slug")({
         { name: "description", content: product.description },
         { property: "og:title", content: `${product.name} — Bình Mỹ FarmGo` },
         { property: "og:description", content: product.description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary" },
       ],
     };
   },

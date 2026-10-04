@@ -1,0 +1,3 @@
+- [x] Add a prominent Riverside listing and direct contact actions to the tourism page.
+- [x] Add Riverside details and illustrated highlights without unverified prices or booking.
+- [x] Check the tourism listing and detail page in the running preview at desktop and mobile sizes.

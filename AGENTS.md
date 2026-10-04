@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Keep all floating quick-contact destinations in `src/lib/contact-config.ts` so missing details consistently show the prototype fallback instead of invented links.
+- Keep venue-specific contact facts in `src/data/riverside.ts` so its tourism listing and detail page stay consistent without affecting the floating quick-contact menu.

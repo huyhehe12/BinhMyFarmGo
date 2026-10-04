@@ -17,6 +17,8 @@ export const Route = createFileRoute("/san-pham/")({
         property: "og:description",
         content: "Khám phá sản phẩm nông nghiệp địa phương, nguồn gốc, mùa vụ và giá tham khảo.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ProductsPage,

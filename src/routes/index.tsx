@@ -20,6 +20,8 @@ export const Route = createFileRoute("/")({
         content:
           "Nguyên mẫu nền tảng quảng bá, kết nối tiêu thụ nông sản và du lịch nông nghiệp tại Bình Mỹ.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Home,
