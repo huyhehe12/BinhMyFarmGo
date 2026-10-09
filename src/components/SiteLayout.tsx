@@ -10,6 +10,7 @@ const navItems = [
   { to: "/don-vi-cung-cap", label: "Đơn vị cung cấp" },
   { to: "/du-lich", label: "Du lịch nông nghiệp" },
   { to: "/ban-do", label: "Bản đồ" },
+  { to: "/smart-pickup", label: "Smart Pickup" },
   { to: "/gioi-thieu", label: "Giới thiệu" },
 ] as const;
 
