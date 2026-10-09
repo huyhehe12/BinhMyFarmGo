@@ -205,11 +205,13 @@ function RequestPage() {
     agree: false,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
+  const [step, setStep] = useState<"form" | "review">("form");
   const [submitted, setSubmitted] = useState<{
     parts: SubmittedPart[];
     total: string;
     payableAmount: number | null;
     form: Form;
+    pickupCode: string | null;
   } | null>(null);
   const [showPayment, setShowPayment] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
