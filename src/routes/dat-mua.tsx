@@ -286,29 +286,51 @@ function RequestPage() {
           items: items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
         },
       });
-      setSubmitted({ parts: out.parts, total, payableAmount: payableTotal, form });
-      setShowPayment(false);
-      submitKey.current = "";
-      clear();
-      window.scrollTo({ top: 0 });
+      finishSubmit(out.parts);
     } catch (error) {
       console.error(error);
       // Prototype phải tiếp tục hoạt động ngay cả khi Supabase chưa được kết nối.
       // Tạo đơn minh họa trên trình duyệt, hiển thị mã BMFG và VietQR động thay vì báo lỗi chặn luồng.
       const demoParts = buildDemoParts(items);
       if (demoParts.length > 0) {
-        setSubmitted({ parts: demoParts, total, payableAmount: payableTotal, form });
-        setShowPayment(false);
-        setSendError(null);
-        submitKey.current = "";
-        clear();
-        window.scrollTo({ top: 0 });
+        finishSubmit(demoParts);
       } else {
         setSendError("Chưa tạo được yêu cầu mua. Vui lòng chọn lại sản phẩm và thử lại.");
       }
     } finally {
       setSending(false);
     }
+  }
+
+  function finishSubmit(parts: SubmittedPart[]) {
+    // Mã đơn công khai + mã nhận hàng bí mật dùng 1 lần cho Smart Pickup.
+    const orderCode = parts[0]?.code ?? makeOrderCode();
+    const pickupCode = form.delivery === DELIVERY_PICKUP ? makePickupCode() : null;
+    saveOrder({
+      code: orderCode,
+      pickupCode: pickupCode ?? makePickupCode(),
+      customerName: form.name,
+      phone: form.phone,
+      delivery: form.delivery,
+      station: form.delivery === DELIVERY_PICKUP ? SMART_PICKUP_STATION : null,
+      pickupDate: form.delivery === DELIVERY_PICKUP ? form.date || null : null,
+      pickupSlot: form.delivery === DELIVERY_PICKUP ? form.time : null,
+      address: form.delivery === DELIVERY_HOME ? form.address : null,
+      items: items.map((i) => ({ name: i.name, quantity: i.quantity, unit: getProduct(i.slug)?.unit ?? "kg" })),
+      amount: payableTotal ?? 0,
+      status: "cho_xac_nhan",
+      locker: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      demo: true,
+    });
+    setSubmitted({ parts, total, payableAmount: payableTotal, form, pickupCode });
+    setShowPayment(false);
+    setSendError(null);
+    setStep("form");
+    submitKey.current = "";
+    clear();
+    window.scrollTo({ top: 0 });
   }
 
   if (submitted) {
