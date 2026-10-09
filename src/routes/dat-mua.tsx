@@ -921,7 +921,7 @@ function RequestPage() {
               disabled={sending}
               className="w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
             >
-              {sending ? "Đang gửi..." : "Gửi yêu cầu mua"}
+              Kiểm tra lại đơn
             </button>
             {sendError && <p className="text-center text-xs text-destructive">{sendError}</p>}
             {Object.keys(errors).length > 0 && (
