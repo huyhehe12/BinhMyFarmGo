@@ -250,8 +250,8 @@ function SmartPickupPanel() {
   );
 
   function assign(code: string, lockerId: string) {
-    const res = assignLocker(code, lockerId as (typeof LOCKER_IDS)[number]);
-    if (!res.ok) toast.error(res.error ?? "Không gán được.");
+    const ok = assignLocker(code, lockerId as (typeof LOCKER_IDS)[number]);
+    if (!ok) toast.error("Không gán được. Ngăn có thể đang bận hoặc bảo trì.");
     else toast.success(`Đã gán ${code} vào ngăn ${lockerId}.`);
     refresh();
   }
