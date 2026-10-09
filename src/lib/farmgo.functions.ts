@@ -85,7 +85,7 @@ const submitSchema = z.object({
   name: z.string().trim().min(1).max(100),
   phone: z.string().trim().regex(phoneRe),
   contact: z.enum(["Điện thoại", "Zalo"]),
-  delivery: z.enum(["Nhận tại vườn/điểm bán", "Giao đến địa chỉ", "Trao đổi với người bán"]),
+  delivery: z.enum(["Nhận tại vườn/điểm bán", "Giao tận nơi", "Nhận tại FarmGo Smart Pickup"]),
   address: z.string().trim().max(300),
   date: z.string().regex(/^(\d{4}-\d{2}-\d{2})?$/),
   time: z.enum(["Sáng", "Chiều", "Linh hoạt"]),
