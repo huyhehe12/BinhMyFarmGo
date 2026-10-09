@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BellRing, Database, MapPinned, QrCode, ShieldCheck } from "lucide-react";
+import { BellRing, Database, MapPinned, PackageCheck, QrCode, ScanLine, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/gioi-thieu")({
   head: () => ({
@@ -103,6 +103,42 @@ function AboutPage() {
               </article>
             );
           })}
+        </div>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="text-2xl font-semibold">Tính năng mô phỏng Smart Pickup (phục vụ báo cáo đề tài)</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Các tính năng dưới đây là mô phỏng prototype dành cho báo cáo đề tài sinh viên: luồng hoạt
+          động đầy đủ trên giao diện nhưng thanh toán và ngăn tủ là DEMO, chưa có giao dịch hay
+          thiết bị thật. Cấu trúc trạng thái đã được thiết kế sẵn để kết nối tủ ESP32/IoT và đối
+          soát thanh toán thật khi triển khai.
+        </p>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <article className="rounded-2xl border border-primary/30 bg-primary/5 p-5 shadow-sm">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-background text-primary">
+              <PackageCheck className="h-5 w-5" />
+            </div>
+            <h3 className="mt-3 text-lg font-semibold">Trạm Smart Pickup & ngăn tủ A01–A06</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Khách chọn “Nhận tại FarmGo Smart Pickup” khi đặt mua, nhận mã nhận hàng bí mật dùng 1
+              lần. Quản trị viên gán đơn vào ngăn, mô phỏng đưa hàng vào trạm và theo dõi trạng
+              thái: Trống / Có hàng / Đã lấy / Bảo trì.
+            </p>
+          </article>
+          <article className="rounded-2xl border border-primary/30 bg-primary/5 p-5 shadow-sm">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-background text-primary">
+              <ScanLine className="h-5 w-5" />
+            </div>
+            <h3 className="mt-3 text-lg font-semibold">Màn hình nhận hàng tại trạm</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Tại trang Nhận hàng, khách nhập mã đơn BMFG hoặc mã nhận hàng, xem số tiền cuối và
+              VietQR đúng số tiền, bấm “Mô phỏng thanh toán (DEMO)” để mở ngăn tủ tương ứng.
+            </p>
+            <Link to="/smart-pickup" className="mt-3 inline-block text-sm font-semibold text-primary hover:underline">
+              Xem quy trình Smart Pickup →
+            </Link>
+          </article>
         </div>
       </section>
 
