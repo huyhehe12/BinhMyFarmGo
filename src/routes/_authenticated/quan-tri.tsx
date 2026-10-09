@@ -5,6 +5,19 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { assignSupplierMember } from "@/lib/farmgo.functions";
+import {
+  assignLocker,
+  getLockers,
+  listOrders,
+  lockerStateLabel,
+  LOCKER_IDS,
+  nextPickupStatus,
+  pickupStatusLabel,
+  releaseLocker,
+  setLockerState,
+  updateOrder,
+  type LockerState,
+} from "@/lib/pickup-store";
 import type { Database } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/quan-tri")({
@@ -77,6 +90,7 @@ function AdminPage() {
         </p>
       )}
       {hasAccess && <Requests isAdmin={!!isAdmin} />}
+      {isAdmin && <SmartPickupPanel />}
       {isAdmin && <Suppliers />}
       {isAdmin && <Locations />}
     </div>
