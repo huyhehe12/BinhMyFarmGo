@@ -374,6 +374,16 @@ function RequestPage() {
             ))}
           </div>
 
+          {submitted.pickupCode && (
+            <div className="mt-4 rounded-xl border border-primary/30 bg-primary/5 p-4 text-center">
+              <p className="text-sm font-semibold">Mã nhận hàng bí mật tại trạm Smart Pickup</p>
+              <p className="mt-1 text-2xl font-bold tracking-widest text-primary">{submitted.pickupCode}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Mã chỉ dùng 1 lần để mở ngăn tủ tại {SMART_PICKUP_STATION}. Vui lòng không chia sẻ cho người khác.
+              </p>
+            </div>
+          )}
+
           <dl className="mt-4 space-y-1 text-sm">
             <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Tạm tính</dt>
