@@ -13,6 +13,13 @@ import {
   submitPurchaseRequest,
   type SubmittedPart,
 } from "@/lib/farmgo.functions";
+import {
+  makeOrderCode,
+  makePickupCode,
+  PICKUP_SLOTS,
+  saveOrder,
+  SMART_PICKUP_STATION,
+} from "@/lib/pickup-store";
 
 export const Route = createFileRoute("/dat-mua")({
   head: () => ({
@@ -38,9 +45,11 @@ export const Route = createFileRoute("/dat-mua")({
 
 const deliveryChoices = [
   "Nhận tại vườn/điểm bán",
-  "Giao đến địa chỉ",
-  "Trao đổi với người bán",
+  "Giao tận nơi",
+  "Nhận tại FarmGo Smart Pickup",
 ] as const;
+const DELIVERY_HOME = "Giao tận nơi";
+const DELIVERY_PICKUP = "Nhận tại FarmGo Smart Pickup";
 const timeChoices = ["Sáng", "Chiều", "Linh hoạt"] as const;
 const contactChoices = ["Điện thoại", "Zalo"] as const;
 
