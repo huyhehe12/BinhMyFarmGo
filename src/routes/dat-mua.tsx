@@ -747,7 +747,7 @@ function RequestPage() {
                 </div>
               )}
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className={`grid gap-4 sm:grid-cols-2 ${form.delivery === DELIVERY_PICKUP ? "hidden" : ""}`}>
                 <label className="block text-sm">
                   <span className="font-medium">Ngày mong muốn nhận hàng</span>
                   <input
@@ -757,6 +757,7 @@ function RequestPage() {
                     onChange={(e) => set("date", e.target.value)}
                     className={inputCls}
                   />
+                  <Err msg={errors.date} />
                 </label>
                 <label className="block text-sm">
                   <span className="font-medium">Thời gian</span>
