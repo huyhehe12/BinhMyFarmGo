@@ -512,6 +512,94 @@ function RequestPage() {
     );
   }
 
+  if (step === "review") {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-12">
+        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+          <h1 className="text-2xl font-bold">Kiểm tra lại đơn hàng</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Vui lòng rà soát thông tin trước khi xác nhận gửi yêu cầu mua.
+          </p>
+
+          <ul className="mt-5 space-y-2 text-sm">
+            {lines.map((line) => (
+              <li key={line.slug} className="flex justify-between gap-4 rounded-xl border border-border p-3">
+                <span>
+                  {line.name} × {line.quantity} {line.unit}
+                </span>
+                <span className="font-semibold text-primary">{line.subtotal}</span>
+              </li>
+            ))}
+          </ul>
+
+          <dl className="mt-5 space-y-1.5 text-sm">
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted-foreground">Tổng dự kiến</dt>
+              <dd className="font-bold text-primary">{total}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted-foreground">Người nhận</dt>
+              <dd className="text-right">{form.name} · {form.phone}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted-foreground">Hình thức nhận hàng</dt>
+              <dd className="text-right font-medium">{form.delivery}</dd>
+            </div>
+            {form.delivery === DELIVERY_HOME && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Địa chỉ giao</dt>
+                <dd className="text-right">{form.address}</dd>
+              </div>
+            )}
+            {form.delivery === DELIVERY_PICKUP && (
+              <>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted-foreground">Trạm nhận</dt>
+                  <dd className="text-right">{SMART_PICKUP_STATION}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted-foreground">Thời gian đến nhận</dt>
+                  <dd className="text-right">{form.date} · {form.time}</dd>
+                </div>
+              </>
+            )}
+            {form.note && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Ghi chú</dt>
+                <dd className="text-right">{form.note}</dd>
+              </div>
+            )}
+          </dl>
+
+          {form.delivery === DELIVERY_PICKUP && (
+            <p className="mt-4 rounded-xl bg-secondary p-3 text-xs text-secondary-foreground">
+              Sau khi gửi, hệ thống tạo mã đơn BMFG công khai và một mã nhận hàng bí mật dùng 1 lần để mở ngăn tủ tại trạm.
+            </p>
+          )}
+
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => setStep("form")}
+              className="flex-1 rounded-full border border-border px-5 py-3 text-sm font-semibold"
+            >
+              Quay lại chỉnh sửa
+            </button>
+            <button
+              type="button"
+              disabled={sending}
+              onClick={doSubmit}
+              className="flex-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+            >
+              {sending ? "Đang gửi..." : "Xác nhận gửi đơn"}
+            </button>
+          </div>
+          {sendError && <p className="mt-3 text-center text-xs text-destructive">{sendError}</p>}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
       <h1 className="text-3xl font-bold sm:text-4xl">Yêu cầu đặt mua</h1>
