@@ -107,7 +107,7 @@ export type SubmittedPart = {
 export const submitPurchaseRequest = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => submitSchema.parse(d))
   .handler(async ({ data }) => {
-    if (data.delivery === "Giao đến địa chỉ" && !data.address) throw new Error("Thiếu địa chỉ nhận hàng.");
+    if (data.delivery === "Giao tận nơi" && !data.address) throw new Error("Thiếu địa chỉ giao hàng.");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const groups = new Map<string, { slug: string; name: string; quantity: number; unit: string; referencePrice: string | null }[]>();
@@ -153,7 +153,7 @@ export const submitPurchaseRequest = createServerFn({ method: "POST" })
             customer_phone: normPhone(data.phone),
             contact_method: data.contact,
             delivery_method: data.delivery,
-            address: data.delivery === "Giao đến địa chỉ" ? data.address : null,
+            address: data.delivery === "Giao tận nơi" ? data.address : null,
             desired_date: data.date || null,
             time_slot: data.time,
             note: data.note || null,
