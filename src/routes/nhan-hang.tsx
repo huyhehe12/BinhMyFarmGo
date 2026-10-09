@@ -86,7 +86,8 @@ function PickupPage() {
     order &&
     (order.status === "da_dua_vao_tram" ||
       order.status === "cho_thanh_toan" ||
-      order.status === "da_thanh_toan");
+      order.status === "da_thanh_toan" ||
+      (done && order.status === "hoan_tat"));
 
   return (
     <div className="mx-auto max-w-xl px-4 py-10">
