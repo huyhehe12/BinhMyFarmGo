@@ -137,9 +137,13 @@ const schema = z
     note: z.string().max(1000, "Ghi chú quá dài."),
     agree: z.literal(true, { message: "Vui lòng đồng ý để được liên hệ xác nhận." }),
   })
-  .refine((d) => d.delivery !== "Giao đến địa chỉ" || d.address.length > 0, {
+  .refine((d) => d.delivery !== DELIVERY_HOME || d.address.length > 0, {
     path: ["address"],
-    message: "Vui lòng nhập địa chỉ nhận hàng.",
+    message: "Vui lòng nhập địa chỉ giao hàng.",
+  })
+  .refine((d) => d.delivery !== DELIVERY_PICKUP || d.date.length > 0, {
+    path: ["date"],
+    message: "Vui lòng chọn ngày đến trạm nhận hàng.",
   });
 
 type Form = {
