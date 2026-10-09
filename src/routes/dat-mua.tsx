@@ -248,7 +248,7 @@ function RequestPage() {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (sending) return;
     const res = schema.safeParse(form);
@@ -262,6 +262,12 @@ function RequestPage() {
       return;
     }
     setErrors({});
+    setStep("review");
+    window.scrollTo({ top: 0 });
+  }
+
+  async function doSubmit() {
+    if (sending) return;
     setSendError(null);
     if (!submitKey.current) submitKey.current = crypto.randomUUID();
     setSending(true);
