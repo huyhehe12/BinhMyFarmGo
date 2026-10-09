@@ -5,6 +5,19 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { assignSupplierMember } from "@/lib/farmgo.functions";
+import {
+  assignLocker,
+  getLockers,
+  listOrders,
+  lockerStateLabel,
+  LOCKER_IDS,
+  nextPickupStatus,
+  pickupStatusLabel,
+  releaseLocker,
+  setLockerState,
+  updateOrder,
+  type LockerState,
+} from "@/lib/pickup-store";
 import type { Database } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/_authenticated/quan-tri")({
@@ -77,6 +90,7 @@ function AdminPage() {
         </p>
       )}
       {hasAccess && <Requests isAdmin={!!isAdmin} />}
+      {isAdmin && <SmartPickupPanel />}
       {isAdmin && <Suppliers />}
       {isAdmin && <Locations />}
     </div>
@@ -223,6 +237,148 @@ function RequestCard({ r, onChange }: { r: any; onChange: () => void }) {
         </p>
       )}
     </div>
+  );
+}
+
+function SmartPickupPanel() {
+  const [, setTick] = useState(0);
+  const refresh = () => setTick((t) => t + 1);
+  const orders = listOrders();
+  const lockers = getLockers();
+  const assignable = orders.filter(
+    (o) => !o.locker && ["da_xac_nhan", "dang_chuan_bi", "cho_xac_nhan"].includes(o.status),
+  );
+
+  function assign(code: string, lockerId: string) {
+    const ok = assignLocker(code, lockerId as (typeof LOCKER_IDS)[number]);
+    if (!ok) toast.error("Không gán được. Ngăn có thể đang bận hoặc bảo trì.");
+    else toast.success(`Đã gán ${code} vào ngăn ${lockerId}.`);
+    refresh();
+  }
+
+  return (
+    <section className="mt-10">
+      <h2 className="text-xl font-semibold">Quản lý Smart Pickup (6 ngăn A01–A06)</h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Mô phỏng prototype — trạng thái ngăn tủ lưu trên trình duyệt, sẵn sàng kết nối ESP32/IoT khi triển khai thật.
+      </p>
+
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        {lockers.map((locker) => (
+          <div key={locker.id} className="rounded-2xl border border-border bg-card p-3 text-center text-sm">
+            <p className="text-lg font-bold">{locker.id}</p>
+            <p className="text-xs text-muted-foreground">{lockerStateLabel[locker.state]}</p>
+            {locker.orderCode && <p className="mt-1 truncate text-xs text-primary">{locker.orderCode}</p>}
+            <div className="mt-2 flex flex-wrap justify-center gap-1">
+              {locker.state === "co_hang" && locker.orderCode && (
+                <button
+                  onClick={() => {
+                    updateOrder(locker.orderCode!, { status: "da_dua_vao_tram" });
+                    refresh();
+                  }}
+                  className="rounded-full bg-primary px-2 py-1 text-xs text-primary-foreground"
+                >
+                  Mô phỏng đưa hàng vào ngăn
+                </button>
+              )}
+              {locker.orderCode && (
+                <button
+                  onClick={() => {
+                    releaseLocker(locker.id);
+                    refresh();
+                  }}
+                  className="rounded-full border border-border px-2 py-1 text-xs"
+                >
+                  Trả ngăn
+                </button>
+              )}
+              {!locker.orderCode && (
+                <select
+                  value={locker.state}
+                  onChange={(e) => {
+                    setLockerState(locker.id, e.target.value as LockerState);
+                    refresh();
+                  }}
+                  className="rounded-full border border-border px-2 py-1 text-xs"
+                >
+                  <option value="trong">Trống</option>
+                  <option value="da_lay">Đã lấy</option>
+                  <option value="bao_tri">Bảo trì</option>
+                </select>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h3 className="mt-6 font-semibold">Gán đơn vào ngăn</h3>
+      {assignable.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">Chưa có đơn chờ gán ngăn.</p>
+      ) : (
+        <ul className="mt-2 grid gap-2 text-sm">
+          {assignable.map((o) => (
+            <li key={o.code} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border bg-card p-3">
+              <span>
+                <b className="text-primary">{o.code}</b> · {o.customerName} · {o.items.map((i) => `${i.name} × ${i.quantity}`).join(", ")}
+                <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-xs">{pickupStatusLabel[o.status]}</span>
+              </span>
+              <span className="flex items-center gap-2">
+                <select id={`locker-${o.code}`} className="rounded-full border border-border px-2 py-1 text-xs" defaultValue="">
+                  <option value="" disabled>
+                    Chọn ngăn trống
+                  </option>
+                  {lockers
+                    .filter((l) => l.state === "trong" && !l.orderCode)
+                    .map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.id}
+                      </option>
+                    ))}
+                </select>
+                <button
+                  onClick={() => {
+                    const sel = document.getElementById(`locker-${o.code}`) as HTMLSelectElement | null;
+                    if (sel?.value) assign(o.code, sel.value);
+                  }}
+                  className="rounded-full bg-primary px-3 py-1.5 text-xs text-primary-foreground"
+                >
+                  Gán vào ngăn
+                </button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <h3 className="mt-6 font-semibold">Đơn Smart Pickup</h3>
+      <ul className="mt-2 grid gap-2 text-sm">
+        {orders.length === 0 && <li className="text-muted-foreground">Chưa có đơn Smart Pickup nào (đơn được tạo khi khách chọn “Nhận tại FarmGo Smart Pickup”).</li>}
+        {orders.map((o) => (
+          <li key={o.code} className="rounded-xl border border-border bg-card p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span>
+                <b className="text-primary">{o.code}</b> · {o.customerName} · {o.phone} · ngăn {o.locker ?? "—"}
+              </span>
+              <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">{pickupStatusLabel[o.status]}</span>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {nextPickupStatus[o.status].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => {
+                    updateOrder(o.code, { status: s });
+                    refresh();
+                  }}
+                  className={`rounded-full px-3 py-1 text-xs ${s === "da_huy" ? "border border-destructive text-destructive" : "bg-primary text-primary-foreground"}`}
+                >
+                  {pickupStatusLabel[s]}
+                </button>
+              ))}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

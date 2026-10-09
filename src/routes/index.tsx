@@ -160,6 +160,53 @@ function Home() {
         </div>
       </section>
 
+      <section className="bg-linear-to-br from-emerald-50 via-background to-sky-50 py-14">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="rounded-3xl border border-primary/20 bg-card p-6 shadow-sm sm:p-10">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-secondary px-3 py-1 text-xs font-semibold text-primary">
+              <MapPinned className="h-4 w-4" />
+              Mô hình mới — thử nghiệm mô phỏng
+            </div>
+            <h2 className="mt-4 text-2xl font-bold sm:text-3xl">
+              FarmGo Smart Pickup — Đặt trước, thanh toán QR, nhận nông sản thuận tiện
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm text-muted-foreground sm:text-base">
+              FarmGo điều phối tập trung với nhà cung cấp: khách đặt nông sản trước, hàng được đưa
+              vào ngăn tủ tại trạm Smart Pickup, khách đến trạm quét QR thanh toán và mở ngăn nhận
+              hàng — không cần chờ giao hàng.
+            </p>
+            <ol className="mt-6 grid gap-3 sm:grid-cols-3">
+              {[
+                "Đặt nông sản trên FarmGo, chọn nhận tại trạm Smart Pickup",
+                "Đến trạm, quét QR và thanh toán đúng số tiền đơn",
+                "Ngăn tủ mở ra, nhận nông sản tươi ngon",
+              ].map((text, i) => (
+                <li key={text} className="flex items-start gap-3 rounded-2xl border border-border bg-background p-4 text-sm">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                    {i + 1}
+                  </span>
+                  {text}
+                </li>
+              ))}
+            </ol>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                to="/smart-pickup"
+                className="rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                Tìm hiểu Smart Pickup
+              </Link>
+              <Link
+                to="/dat-mua"
+                className="rounded-full border border-primary px-5 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
+              >
+                Đặt mua nông sản
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-6xl px-4 py-14">
         <h2 className="text-2xl font-bold sm:text-3xl">Vì sao cần Bình Mỹ FarmGo?</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-3">

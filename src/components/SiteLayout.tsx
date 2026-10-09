@@ -10,6 +10,7 @@ const navItems = [
   { to: "/don-vi-cung-cap", label: "Đơn vị cung cấp" },
   { to: "/du-lich", label: "Du lịch nông nghiệp" },
   { to: "/ban-do", label: "Bản đồ" },
+  { to: "/smart-pickup", label: "Smart Pickup" },
   { to: "/gioi-thieu", label: "Giới thiệu" },
 ] as const;
 
@@ -56,7 +57,7 @@ function SiteHeader() {
             to="/dat-mua"
             className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Yêu cầu mua
+            Đặt mua nông sản
             <span className="inline-flex min-w-6 justify-center rounded-full bg-primary-foreground/20 px-1.5 text-xs">
               {totalQuantity}
             </span>

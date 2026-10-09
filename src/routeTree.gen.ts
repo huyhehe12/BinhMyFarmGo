@@ -17,6 +17,8 @@ import { Route as DatMuaRouteImport } from './routes/dat-mua'
 import { Route as DonViCungCapRouteImport } from './routes/don-vi-cung-cap'
 import { Route as DuLichRouteImport } from './routes/du-lich'
 import { Route as GioiThieuRouteImport } from './routes/gioi-thieu'
+import { Route as NhanHangRouteImport } from './routes/nhan-hang'
+import { Route as SmartPickupRouteImport } from './routes/smart-pickup'
 import { Route as AuthenticatedQuanTriRouteImport } from './routes/_authenticated/quan-tri'
 import { Route as DuLichBinhMyRiversideRouteImport } from './routes/du-lich_.binh-my-riverside'
 import { Route as SanPhamIndexRouteImport } from './routes/san-pham.index'
@@ -61,6 +63,16 @@ const GioiThieuRoute = GioiThieuRouteImport.update({
   path: '/gioi-thieu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NhanHangRoute = NhanHangRouteImport.update({
+  id: '/nhan-hang',
+  path: '/nhan-hang',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SmartPickupRoute = SmartPickupRouteImport.update({
+  id: '/smart-pickup',
+  path: '/smart-pickup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedQuanTriRoute = AuthenticatedQuanTriRouteImport.update({
   id: '/quan-tri',
   path: '/quan-tri',
@@ -90,6 +102,8 @@ export interface FileRoutesByFullPath {
   '/don-vi-cung-cap': typeof DonViCungCapRoute
   '/du-lich': typeof DuLichRoute
   '/gioi-thieu': typeof GioiThieuRoute
+  '/nhan-hang': typeof NhanHangRoute
+  '/smart-pickup': typeof SmartPickupRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
   '/du-lich/binh-my-riverside': typeof DuLichBinhMyRiversideRoute
   '/san-pham/$slug': typeof SanPhamSlugRoute
@@ -103,6 +117,8 @@ export interface FileRoutesByTo {
   '/don-vi-cung-cap': typeof DonViCungCapRoute
   '/du-lich': typeof DuLichRoute
   '/gioi-thieu': typeof GioiThieuRoute
+  '/nhan-hang': typeof NhanHangRoute
+  '/smart-pickup': typeof SmartPickupRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
   '/du-lich/binh-my-riverside': typeof DuLichBinhMyRiversideRoute
   '/san-pham/$slug': typeof SanPhamSlugRoute
@@ -118,6 +134,8 @@ export interface FileRoutesById {
   '/don-vi-cung-cap': typeof DonViCungCapRoute
   '/du-lich': typeof DuLichRoute
   '/gioi-thieu': typeof GioiThieuRoute
+  '/nhan-hang': typeof NhanHangRoute
+  '/smart-pickup': typeof SmartPickupRoute
   '/_authenticated/quan-tri': typeof AuthenticatedQuanTriRoute
   '/du-lich_/binh-my-riverside': typeof DuLichBinhMyRiversideRoute
   '/san-pham/$slug': typeof SanPhamSlugRoute
@@ -133,6 +151,8 @@ export interface FileRouteTypes {
     | '/don-vi-cung-cap'
     | '/du-lich'
     | '/gioi-thieu'
+    | '/nhan-hang'
+    | '/smart-pickup'
     | '/quan-tri'
     | '/du-lich/binh-my-riverside'
     | '/san-pham/$slug'
@@ -146,6 +166,8 @@ export interface FileRouteTypes {
     | '/don-vi-cung-cap'
     | '/du-lich'
     | '/gioi-thieu'
+    | '/nhan-hang'
+    | '/smart-pickup'
     | '/quan-tri'
     | '/du-lich/binh-my-riverside'
     | '/san-pham/$slug'
@@ -160,6 +182,8 @@ export interface FileRouteTypes {
     | '/don-vi-cung-cap'
     | '/du-lich'
     | '/gioi-thieu'
+    | '/nhan-hang'
+    | '/smart-pickup'
     | '/_authenticated/quan-tri'
     | '/du-lich_/binh-my-riverside'
     | '/san-pham/$slug'
@@ -175,6 +199,8 @@ export interface RootRouteChildren {
   DonViCungCapRoute: typeof DonViCungCapRoute
   DuLichRoute: typeof DuLichRoute
   GioiThieuRoute: typeof GioiThieuRoute
+  NhanHangRoute: typeof NhanHangRoute
+  SmartPickupRoute: typeof SmartPickupRoute
   DuLichBinhMyRiversideRoute: typeof DuLichBinhMyRiversideRoute
   SanPhamSlugRoute: typeof SanPhamSlugRoute
   SanPhamIndexRoute: typeof SanPhamIndexRoute
@@ -238,6 +264,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GioiThieuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/nhan-hang': {
+      id: '/nhan-hang'
+      path: '/nhan-hang'
+      fullPath: '/nhan-hang'
+      preLoaderRoute: typeof NhanHangRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/smart-pickup': {
+      id: '/smart-pickup'
+      path: '/smart-pickup'
+      fullPath: '/smart-pickup'
+      preLoaderRoute: typeof SmartPickupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/quan-tri': {
       id: '/_authenticated/quan-tri'
       path: '/quan-tri'
@@ -289,6 +329,8 @@ const rootRouteChildren: RootRouteChildren = {
   DonViCungCapRoute: DonViCungCapRoute,
   DuLichRoute: DuLichRoute,
   GioiThieuRoute: GioiThieuRoute,
+  NhanHangRoute: NhanHangRoute,
+  SmartPickupRoute: SmartPickupRoute,
   DuLichBinhMyRiversideRoute: DuLichBinhMyRiversideRoute,
   SanPhamSlugRoute: SanPhamSlugRoute,
   SanPhamIndexRoute: SanPhamIndexRoute,

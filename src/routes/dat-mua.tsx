@@ -13,6 +13,13 @@ import {
   submitPurchaseRequest,
   type SubmittedPart,
 } from "@/lib/farmgo.functions";
+import {
+  makeOrderCode,
+  makePickupCode,
+  PICKUP_SLOTS,
+  saveOrder,
+  SMART_PICKUP_STATION,
+} from "@/lib/pickup-store";
 
 export const Route = createFileRoute("/dat-mua")({
   head: () => ({
@@ -38,9 +45,11 @@ export const Route = createFileRoute("/dat-mua")({
 
 const deliveryChoices = [
   "Nhận tại vườn/điểm bán",
-  "Giao đến địa chỉ",
-  "Trao đổi với người bán",
+  "Giao tận nơi",
+  "Nhận tại FarmGo Smart Pickup",
 ] as const;
+const DELIVERY_HOME = "Giao tận nơi";
+const DELIVERY_PICKUP = "Nhận tại FarmGo Smart Pickup";
 const timeChoices = ["Sáng", "Chiều", "Linh hoạt"] as const;
 const contactChoices = ["Điện thoại", "Zalo"] as const;
 
@@ -128,9 +137,13 @@ const schema = z
     note: z.string().max(1000, "Ghi chú quá dài."),
     agree: z.literal(true, { message: "Vui lòng đồng ý để được liên hệ xác nhận." }),
   })
-  .refine((d) => d.delivery !== "Giao đến địa chỉ" || d.address.length > 0, {
+  .refine((d) => d.delivery !== DELIVERY_HOME || d.address.length > 0, {
     path: ["address"],
-    message: "Vui lòng nhập địa chỉ nhận hàng.",
+    message: "Vui lòng nhập địa chỉ giao hàng.",
+  })
+  .refine((d) => d.delivery !== DELIVERY_PICKUP || d.date.length > 0, {
+    path: ["date"],
+    message: "Vui lòng chọn ngày đến trạm nhận hàng.",
   });
 
 type Form = {
@@ -192,11 +205,13 @@ function RequestPage() {
     agree: false,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
+  const [step, setStep] = useState<"form" | "review">("form");
   const [submitted, setSubmitted] = useState<{
     parts: SubmittedPart[];
     total: string;
     payableAmount: number | null;
     form: Form;
+    pickupCode: string | null;
   } | null>(null);
   const [showPayment, setShowPayment] = useState(false);
   const [showDetail, setShowDetail] = useState(false);
@@ -233,7 +248,7 @@ function RequestPage() {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (sending) return;
     const res = schema.safeParse(form);
@@ -247,6 +262,12 @@ function RequestPage() {
       return;
     }
     setErrors({});
+    setStep("review");
+    window.scrollTo({ top: 0 });
+  }
+
+  async function doSubmit() {
+    if (sending) return;
     setSendError(null);
     if (!submitKey.current) submitKey.current = crypto.randomUUID();
     setSending(true);
@@ -265,29 +286,51 @@ function RequestPage() {
           items: items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
         },
       });
-      setSubmitted({ parts: out.parts, total, payableAmount: payableTotal, form });
-      setShowPayment(false);
-      submitKey.current = "";
-      clear();
-      window.scrollTo({ top: 0 });
+      finishSubmit(out.parts);
     } catch (error) {
       console.error(error);
       // Prototype phải tiếp tục hoạt động ngay cả khi Supabase chưa được kết nối.
       // Tạo đơn minh họa trên trình duyệt, hiển thị mã BMFG và VietQR động thay vì báo lỗi chặn luồng.
       const demoParts = buildDemoParts(items);
       if (demoParts.length > 0) {
-        setSubmitted({ parts: demoParts, total, payableAmount: payableTotal, form });
-        setShowPayment(false);
-        setSendError(null);
-        submitKey.current = "";
-        clear();
-        window.scrollTo({ top: 0 });
+        finishSubmit(demoParts);
       } else {
         setSendError("Chưa tạo được yêu cầu mua. Vui lòng chọn lại sản phẩm và thử lại.");
       }
     } finally {
       setSending(false);
     }
+  }
+
+  function finishSubmit(parts: SubmittedPart[]) {
+    // Mã đơn công khai + mã nhận hàng bí mật dùng 1 lần cho Smart Pickup.
+    const orderCode = parts[0]?.code ?? makeOrderCode();
+    const pickupCode = form.delivery === DELIVERY_PICKUP ? makePickupCode() : null;
+    saveOrder({
+      code: orderCode,
+      pickupCode: pickupCode ?? makePickupCode(),
+      customerName: form.name,
+      phone: form.phone,
+      delivery: form.delivery,
+      station: form.delivery === DELIVERY_PICKUP ? SMART_PICKUP_STATION : null,
+      pickupDate: form.delivery === DELIVERY_PICKUP ? form.date || null : null,
+      pickupSlot: form.delivery === DELIVERY_PICKUP ? form.time : null,
+      address: form.delivery === DELIVERY_HOME ? form.address : null,
+      items: items.map((i) => ({ name: i.name, quantity: i.quantity, unit: getProduct(i.slug)?.unit ?? "kg" })),
+      amount: payableTotal ?? 0,
+      status: "cho_xac_nhan",
+      locker: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      demo: true,
+    });
+    setSubmitted({ parts, total, payableAmount: payableTotal, form, pickupCode });
+    setShowPayment(false);
+    setSendError(null);
+    setStep("form");
+    submitKey.current = "";
+    clear();
+    window.scrollTo({ top: 0 });
   }
 
   if (submitted) {
@@ -330,6 +373,16 @@ function RequestPage() {
               </div>
             ))}
           </div>
+
+          {submitted.pickupCode && (
+            <div className="mt-4 rounded-xl border border-primary/30 bg-primary/5 p-4 text-center">
+              <p className="text-sm font-semibold">Mã nhận hàng bí mật tại trạm Smart Pickup</p>
+              <p className="mt-1 text-2xl font-bold tracking-widest text-primary">{submitted.pickupCode}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Mã chỉ dùng 1 lần để mở ngăn tủ tại {SMART_PICKUP_STATION}. Vui lòng không chia sẻ cho người khác.
+              </p>
+            </div>
+          )}
 
           <dl className="mt-4 space-y-1 text-sm">
             <div className="flex justify-between gap-4">
@@ -454,6 +507,94 @@ function RequestPage() {
               ? "Bản thử nghiệm: QR thanh toán được tạo để minh họa luồng đặt mua; hệ thống chưa tự đối soát giao dịch ngân hàng."
               : "Giá cuối cùng, phí giao hàng và tình trạng hàng sẽ do người bán xác nhận. Bạn có thể tra cứu bằng mã yêu cầu."}
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === "review") {
+    return (
+      <div className="mx-auto max-w-2xl px-4 py-12">
+        <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
+          <h1 className="text-2xl font-bold">Kiểm tra lại đơn hàng</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Vui lòng rà soát thông tin trước khi xác nhận gửi yêu cầu mua.
+          </p>
+
+          <ul className="mt-5 space-y-2 text-sm">
+            {lines.map((line) => (
+              <li key={line.slug} className="flex justify-between gap-4 rounded-xl border border-border p-3">
+                <span>
+                  {line.name} × {line.quantity} {line.unit}
+                </span>
+                <span className="font-semibold text-primary">{line.subtotal}</span>
+              </li>
+            ))}
+          </ul>
+
+          <dl className="mt-5 space-y-1.5 text-sm">
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted-foreground">Tổng dự kiến</dt>
+              <dd className="font-bold text-primary">{total}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted-foreground">Người nhận</dt>
+              <dd className="text-right">{form.name} · {form.phone}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted-foreground">Hình thức nhận hàng</dt>
+              <dd className="text-right font-medium">{form.delivery}</dd>
+            </div>
+            {form.delivery === DELIVERY_HOME && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Địa chỉ giao</dt>
+                <dd className="text-right">{form.address}</dd>
+              </div>
+            )}
+            {form.delivery === DELIVERY_PICKUP && (
+              <>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted-foreground">Trạm nhận</dt>
+                  <dd className="text-right">{SMART_PICKUP_STATION}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-muted-foreground">Thời gian đến nhận</dt>
+                  <dd className="text-right">{form.date} · {form.time}</dd>
+                </div>
+              </>
+            )}
+            {form.note && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Ghi chú</dt>
+                <dd className="text-right">{form.note}</dd>
+              </div>
+            )}
+          </dl>
+
+          {form.delivery === DELIVERY_PICKUP && (
+            <p className="mt-4 rounded-xl bg-secondary p-3 text-xs text-secondary-foreground">
+              Sau khi gửi, hệ thống tạo mã đơn BMFG công khai và một mã nhận hàng bí mật dùng 1 lần để mở ngăn tủ tại trạm.
+            </p>
+          )}
+
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => setStep("form")}
+              className="flex-1 rounded-full border border-border px-5 py-3 text-sm font-semibold"
+            >
+              Quay lại chỉnh sửa
+            </button>
+            <button
+              type="button"
+              disabled={sending}
+              onClick={doSubmit}
+              className="flex-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+            >
+              {sending ? "Đang gửi..." : "Xác nhận gửi đơn"}
+            </button>
+          </div>
+          {sendError && <p className="mt-3 text-center text-xs text-destructive">{sendError}</p>}
         </div>
       </div>
     );
@@ -645,9 +786,9 @@ function RequestPage() {
                 <Err msg={errors.delivery} />
               </fieldset>
 
-              {form.delivery === "Giao đến địa chỉ" && (
+              {form.delivery === DELIVERY_HOME && (
                 <label className="block text-sm">
-                  <span className="font-medium">Địa chỉ nhận hàng *</span>
+                  <span className="font-medium">Địa chỉ giao hàng *</span>
                   <input
                     value={form.address}
                     maxLength={300}
@@ -658,7 +799,43 @@ function RequestPage() {
                 </label>
               )}
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              {form.delivery === DELIVERY_PICKUP && (
+                <div className="space-y-3 rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm">
+                  <p className="font-semibold text-primary">Nhận tại trạm Smart Pickup</p>
+                  <p className="text-muted-foreground">
+                    Trạm nhận: <span className="font-medium text-foreground">{SMART_PICKUP_STATION}</span>
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="font-medium">Ngày đến nhận *</span>
+                      <input
+                        type="date"
+                        min={today}
+                        value={form.date}
+                        onChange={(e) => set("date", e.target.value)}
+                        className={inputCls}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="font-medium">Khung giờ nhận *</span>
+                      <select
+                        value={PICKUP_SLOTS.includes(form.time as (typeof PICKUP_SLOTS)[number]) ? form.time : PICKUP_SLOTS[0]}
+                        onChange={(e) => set("time", e.target.value)}
+                        className={inputCls}
+                      >
+                        {PICKUP_SLOTS.map((slot) => (
+                          <option key={slot}>{slot}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Sau khi gửi đơn, bạn sẽ nhận một mã nhận hàng bí mật dùng 1 lần để mở ngăn tủ tại trạm.
+                  </p>
+                </div>
+              )}
+
+              <div className={`grid gap-4 sm:grid-cols-2 ${form.delivery === DELIVERY_PICKUP ? "hidden" : ""}`}>
                 <label className="block text-sm">
                   <span className="font-medium">Ngày mong muốn nhận hàng</span>
                   <input
@@ -668,6 +845,7 @@ function RequestPage() {
                     onChange={(e) => set("date", e.target.value)}
                     className={inputCls}
                   />
+                  <Err msg={errors.date} />
                 </label>
                 <label className="block text-sm">
                   <span className="font-medium">Thời gian</span>
@@ -743,7 +921,7 @@ function RequestPage() {
               disabled={sending}
               className="w-full rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
             >
-              {sending ? "Đang gửi..." : "Gửi yêu cầu mua"}
+              Kiểm tra lại đơn
             </button>
             {sendError && <p className="text-center text-xs text-destructive">{sendError}</p>}
             {Object.keys(errors).length > 0 && (
