@@ -698,9 +698,9 @@ function RequestPage() {
                 <Err msg={errors.delivery} />
               </fieldset>
 
-              {form.delivery === "Giao đến địa chỉ" && (
+              {form.delivery === DELIVERY_HOME && (
                 <label className="block text-sm">
-                  <span className="font-medium">Địa chỉ nhận hàng *</span>
+                  <span className="font-medium">Địa chỉ giao hàng *</span>
                   <input
                     value={form.address}
                     maxLength={300}
@@ -709,6 +709,42 @@ function RequestPage() {
                   />
                   <Err msg={errors.address} />
                 </label>
+              )}
+
+              {form.delivery === DELIVERY_PICKUP && (
+                <div className="space-y-3 rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm">
+                  <p className="font-semibold text-primary">Nhận tại trạm Smart Pickup</p>
+                  <p className="text-muted-foreground">
+                    Trạm nhận: <span className="font-medium text-foreground">{SMART_PICKUP_STATION}</span>
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="block">
+                      <span className="font-medium">Ngày đến nhận *</span>
+                      <input
+                        type="date"
+                        min={today}
+                        value={form.date}
+                        onChange={(e) => set("date", e.target.value)}
+                        className={inputCls}
+                      />
+                    </label>
+                    <label className="block">
+                      <span className="font-medium">Khung giờ nhận *</span>
+                      <select
+                        value={PICKUP_SLOTS.includes(form.time as (typeof PICKUP_SLOTS)[number]) ? form.time : PICKUP_SLOTS[0]}
+                        onChange={(e) => set("time", e.target.value)}
+                        className={inputCls}
+                      >
+                        {PICKUP_SLOTS.map((slot) => (
+                          <option key={slot}>{slot}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Sau khi gửi đơn, bạn sẽ nhận một mã nhận hàng bí mật dùng 1 lần để mở ngăn tủ tại trạm.
+                  </p>
+                </div>
               )}
 
               <div className="grid gap-4 sm:grid-cols-2">
