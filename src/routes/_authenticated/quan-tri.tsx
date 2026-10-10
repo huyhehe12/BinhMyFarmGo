@@ -19,6 +19,7 @@ import {
   type LockerState,
 } from "@/lib/pickup-store";
 import type { Database } from "@/integrations/supabase/types";
+import { PartnerApplicationsPanel } from "@/components/PartnerApplicationsPanel";
 
 export const Route = createFileRoute("/_authenticated/quan-tri")({
   head: () => ({
@@ -91,6 +92,7 @@ function AdminPage() {
       )}
       {hasAccess && <Requests isAdmin={!!isAdmin} />}
       {isAdmin && <SmartPickupPanel />}
+      {isAdmin && <PartnerApplicationsPanel />}
       {isAdmin && <Suppliers />}
       {isAdmin && <Locations />}
     </div>

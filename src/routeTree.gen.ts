@@ -17,6 +17,7 @@ import { Route as DatMuaRouteImport } from './routes/dat-mua'
 import { Route as DonViCungCapRouteImport } from './routes/don-vi-cung-cap'
 import { Route as DuLichRouteImport } from './routes/du-lich'
 import { Route as GioiThieuRouteImport } from './routes/gioi-thieu'
+import { Route as HopTacRouteImport } from './routes/hop-tac'
 import { Route as NhanHangRouteImport } from './routes/nhan-hang'
 import { Route as SmartPickupRouteImport } from './routes/smart-pickup'
 import { Route as AuthenticatedQuanTriRouteImport } from './routes/_authenticated/quan-tri'
@@ -63,6 +64,11 @@ const GioiThieuRoute = GioiThieuRouteImport.update({
   path: '/gioi-thieu',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HopTacRoute = HopTacRouteImport.update({
+  id: '/hop-tac',
+  path: '/hop-tac',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const NhanHangRoute = NhanHangRouteImport.update({
   id: '/nhan-hang',
   path: '/nhan-hang',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/don-vi-cung-cap': typeof DonViCungCapRoute
   '/du-lich': typeof DuLichRoute
   '/gioi-thieu': typeof GioiThieuRoute
+  '/hop-tac': typeof HopTacRoute
   '/nhan-hang': typeof NhanHangRoute
   '/smart-pickup': typeof SmartPickupRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/don-vi-cung-cap': typeof DonViCungCapRoute
   '/du-lich': typeof DuLichRoute
   '/gioi-thieu': typeof GioiThieuRoute
+  '/hop-tac': typeof HopTacRoute
   '/nhan-hang': typeof NhanHangRoute
   '/smart-pickup': typeof SmartPickupRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/don-vi-cung-cap': typeof DonViCungCapRoute
   '/du-lich': typeof DuLichRoute
   '/gioi-thieu': typeof GioiThieuRoute
+  '/hop-tac': typeof HopTacRoute
   '/nhan-hang': typeof NhanHangRoute
   '/smart-pickup': typeof SmartPickupRoute
   '/_authenticated/quan-tri': typeof AuthenticatedQuanTriRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/don-vi-cung-cap'
     | '/du-lich'
     | '/gioi-thieu'
+    | '/hop-tac'
     | '/nhan-hang'
     | '/smart-pickup'
     | '/quan-tri'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/don-vi-cung-cap'
     | '/du-lich'
     | '/gioi-thieu'
+    | '/hop-tac'
     | '/nhan-hang'
     | '/smart-pickup'
     | '/quan-tri'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/don-vi-cung-cap'
     | '/du-lich'
     | '/gioi-thieu'
+    | '/hop-tac'
     | '/nhan-hang'
     | '/smart-pickup'
     | '/_authenticated/quan-tri'
@@ -199,6 +211,7 @@ export interface RootRouteChildren {
   DonViCungCapRoute: typeof DonViCungCapRoute
   DuLichRoute: typeof DuLichRoute
   GioiThieuRoute: typeof GioiThieuRoute
+  HopTacRoute: typeof HopTacRoute
   NhanHangRoute: typeof NhanHangRoute
   SmartPickupRoute: typeof SmartPickupRoute
   DuLichBinhMyRiversideRoute: typeof DuLichBinhMyRiversideRoute
@@ -262,6 +275,13 @@ declare module '@tanstack/react-router' {
       path: '/gioi-thieu'
       fullPath: '/gioi-thieu'
       preLoaderRoute: typeof GioiThieuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hop-tac': {
+      id: '/hop-tac'
+      path: '/hop-tac'
+      fullPath: '/hop-tac'
+      preLoaderRoute: typeof HopTacRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/nhan-hang': {
@@ -329,6 +349,7 @@ const rootRouteChildren: RootRouteChildren = {
   DonViCungCapRoute: DonViCungCapRoute,
   DuLichRoute: DuLichRoute,
   GioiThieuRoute: GioiThieuRoute,
+  HopTacRoute: HopTacRoute,
   NhanHangRoute: NhanHangRoute,
   SmartPickupRoute: SmartPickupRoute,
   DuLichBinhMyRiversideRoute: DuLichBinhMyRiversideRoute,

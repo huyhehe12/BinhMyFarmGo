@@ -3,6 +3,7 @@ import { useState, type ReactNode } from "react";
 import farmGoLogo from "@/assets/logo-farmgo.png";
 import { FloatingContactMenu } from "@/components/FloatingContactMenu";
 import { useRequestCart } from "@/lib/request-cart";
+import { contactConfig } from "@/lib/contact-config";
 
 const navItems = [
   { to: "/", label: "Trang chủ" },
@@ -11,6 +12,7 @@ const navItems = [
   { to: "/du-lich", label: "Du lịch nông nghiệp" },
   { to: "/ban-do", label: "Bản đồ" },
   { to: "/smart-pickup", label: "Smart Pickup" },
+  { to: "/hop-tac", label: "Hợp tác" },
   { to: "/gioi-thieu", label: "Giới thiệu" },
 ] as const;
 
@@ -107,6 +109,16 @@ function SiteFooter() {
             Nền tảng thử nghiệm hỗ trợ quảng bá nông sản, kết nối yêu cầu mua và trải nghiệm du
             lịch nông nghiệp Bình Mỹ. Một số dữ liệu về giá, đơn vị cung cấp và địa điểm vẫn đang
             được xác minh trước khi triển khai thực tế.
+          </p>
+          <p className="mt-3">
+            Hotline FarmGo:{" "}
+            <a href={`tel:${contactConfig.phone}`} className="font-semibold text-primary">
+              {contactConfig.phone}
+            </a>
+            {" · "}
+            <Link to="/hop-tac" className="font-semibold text-primary">
+              Hợp tác
+            </Link>
           </p>
         </div>
       </div>
